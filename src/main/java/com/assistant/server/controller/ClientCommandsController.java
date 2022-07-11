@@ -3,10 +3,7 @@ package com.assistant.server.controller;
 import com.assistant.server.service.CommandsStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,8 +18,15 @@ public class ClientCommandsController {
     }
 
     @RequestMapping(value = "/pool-all-commands", method = RequestMethod.GET)
-    public List<String> sendMessageToTelegramBot() {
+    @ResponseBody
+    public List<String> poolAllCommands() {
         return commandsStorage.pollAllCommands();
+    }
+
+    @RequestMapping(value = "/pool-first-commands", method = RequestMethod.GET)
+    @ResponseBody
+    public String poolFirstCommand() {
+        return commandsStorage.poolFirstCommand();
     }
 
 }

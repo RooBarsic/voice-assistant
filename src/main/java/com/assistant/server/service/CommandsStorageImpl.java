@@ -28,4 +28,11 @@ public class CommandsStorageImpl implements CommandsStorage {
         }
         return commands;
     }
+
+    @Override
+    public String poolFirstCommand() {
+        synchronized (storedCommands) {
+            return storedCommands.isEmpty() ? "" : storedCommands.poll();
+        }
+    }
 }
