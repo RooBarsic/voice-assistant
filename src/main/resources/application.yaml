@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:h2DB;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=true
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.h2.Driver
+  jpa:
+    database: h2
+  #    properties:
+  #      hibernate:
+  #        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    baseline-version: 1
+    check-location: true
+    locations: "classpath:db_migration"
+
+
+bots:
+  telegram:
+    connect: ${TELEGRAM_BOT_CONNECT:false}
+    botName: ${TELEGRAM_BOT_NAME:}
+    botToken: ${TELEGRAM_BOT_TOKEN:}
+  mail-ru:
+    connect: ${MAIL_RU_AGENT_BOT_CONNECT:false}
+    botName: ${MAIL_RU_AGENT_BOT_NAME:}
+    botToken: ${MAIL_RU_AGENT_BOT_TOKEN:}
+  yandex-alisa:
+    connect: ${YANDEX_ALISA_BOT_CONNECT:true}
+    welcomeWord: ${YANDEX_ALISA_STOP_WORD:Скажи 'стоп' чтобы выйти из навыка}
+    stopWord: ${YANDEX_ALISA_STOP_WORD:стоп}
+    byeWord: ${YANDEX_ALISA_STOP_WORD:Пока}
+
