@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class AssistantClient {
@@ -11,9 +13,7 @@ public class AssistantClient {
             String response = BotNetUtils.httpsGETRequest(PATH);
             if (!response.isEmpty()) {
                 System.out.println("Starting running command : " + response);
-                runCommand(response);
-                excCommand(response);
-                //runProject(response);
+                excCommand(parseCommand(response));
             }
             try {
                 Thread.sleep(1000);
@@ -23,81 +23,41 @@ public class AssistantClient {
         }
     }
 
-    public static boolean runProject(String command){
-        try {
-//            Process compilingProcess = Runtime.getRuntime().exec(command);
-//            while (compilingProcess.isAlive()){
-//
-//            }
-            Process runInTest = Runtime.getRuntime().exec(command);
-            while (runInTest.isAlive()){
-
-            }
-            try (BufferedReader input =
-                         new BufferedReader(new
-                                 InputStreamReader(runInTest.getInputStream()))) {
-                String line;
-                while ((line = input.readLine()) != null) {
-                    System.out.println(line);
-                }
-            }
-
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    public static String parseCommand(String response) {
+        if (response.equals("/firefox")) {
+            return "start firefox";
         }
+        if (response.startsWith("/firefox")) {
+            String[] split = response.split("/firefox", 2);
+            return "start firefox" + split[1];
+        }
+        if (response.equals("/chrome")) {
+            return "start chrome";
+        }
+        if (response.startsWith("/chrome")) {
+            String[] split = response.split("/chrome", 2);
+            return "start chrome" + split[1];
+        }
+        if (response.startsWith("/lock")) {
+            return "rundll32.exe user32.dll,LockWorkStation";
+        }
+        if (response.startsWith("/unlock")) {
+            return "rundll32.exe user32.dll,UnlockWorkStation";
+        }
+        if (response.startsWith("/hibernate")) {
+            return "Rundll32.exe powrprof.dll,SetSuspendState";
+        }
+        return response;
     }
 
     public static void excCommand(String command){
         Runtime rt = Runtime.getRuntime();
         try {
+            System.out.println("executing command : " + command + "|");
             rt.exec(new String[]{"cmd.exe","/c",command});
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public static void runCommand(String command) {
-        try {
-
-            ProcessBuilder processBuilder = new ProcessBuilder();
-
-            // Run a shell command
-            processBuilder.command("bash", "-c", command);
-
-            Process process = processBuilder.start();
-
-            while (process.isAlive()) {
-
-            }
-
-            StringBuilder output = new StringBuilder();
-
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
-                System.out.println("waiting command : " + command);
-            }
-
-            int exitVal = process.waitFor();
-            if (exitVal == 0) {
-                System.out.println("Success!");
-                System.out.println(output);
-            } else {
-                System.out.println("No response from command");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }
