@@ -14,3 +14,4 @@ buildNumber.properties
 /target
 .env
 /src/main/resources/application-dev.yaml
+/testing-area
