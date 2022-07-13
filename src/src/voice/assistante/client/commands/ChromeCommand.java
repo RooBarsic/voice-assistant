@@ -12,7 +12,7 @@ public class ChromeCommand implements Command {
             return "start chrome";
         }
         if (message.startsWith("/chrome")) {
-            String[] split = message.split("/chrome", 2);
+            String[] split = message.split("/chrome ", 2);
             return "start chrome" + split[1];
         }
         return message;

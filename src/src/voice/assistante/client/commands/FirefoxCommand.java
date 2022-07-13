@@ -12,7 +12,7 @@ public class FirefoxCommand implements Command {
             return "start firefox";
         }
         if (message.startsWith("/firefox")) {
-            String[] split = message.split("/firefox", 2);
+            String[] split = message.split("/firefox ", 2);
             return "start firefox" + split[1];
         }
         return message;
