@@ -2,37 +2,32 @@ package com.assistant.server.service;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
 public class CommandsStorageImpl implements CommandsStorage {
-    private final ConcurrentLinkedQueue<String> storedCommands = new ConcurrentLinkedQueue<>();
+    private final Map<String, ConcurrentLinkedQueue<String>> storedCommandsByUser = new HashMap<>();
 
     @Override
-    public void saveCommand(String command) {
-        storedCommands.add(command);
-    }
-
-    @Override
-    public List<String> pollAllCommands() {
-        if (storedCommands.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<String> commands = new ArrayList<>();
-        while (!storedCommands.isEmpty()) {
-            String command = storedCommands.poll();
+    public void saveCommand(String userName, String command) {
+        synchronized (storedCommandsByUser) {
+            ConcurrentLinkedQueue<String> commands = storedCommandsByUser.getOrDefault(userName, null);
+            if (commands == null) {
+                storedCommandsByUser.put(userName, commands = new ConcurrentLinkedQueue<>());
+            }
             commands.add(command);
         }
-        return commands;
     }
 
     @Override
-    public String poolFirstCommand() {
-        synchronized (storedCommands) {
-            return storedCommands.isEmpty() ? "" : storedCommands.poll();
+    public String poolFirstCommand(String userName) {
+        synchronized (storedCommandsByUser) {
+            if (storedCommandsByUser.containsKey(userName)) {
+                ConcurrentLinkedQueue<String> commands = storedCommandsByUser.get(userName);
+                return commands.isEmpty() ? "" : commands.poll();
+            }
         }
+        return "";
     }
 }

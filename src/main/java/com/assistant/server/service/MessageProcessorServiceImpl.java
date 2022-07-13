@@ -15,32 +15,61 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Service
 public class MessageProcessorServiceImpl implements BotLogic {
     private final CommandsStorage commandsStorage;
+    private final UserKeyWordService userKeyWordService;
     private String SERVICE_NAME = "BotLogicImpl: ";
     private ConcurrentLinkedDeque<BotNetMessage> responseQueue = new ConcurrentLinkedDeque<>();
     private Map<UiPlatform, BotResponseSender> responseSenderMap = new HashMap<>();
 
 
     @Autowired
-    MessageProcessorServiceImpl(final CommandsStorage commandsStorage) {
+    MessageProcessorServiceImpl(final CommandsStorage commandsStorage,
+                                final UserKeyWordService userKeyWordService) {
         this.commandsStorage = commandsStorage;
+        this.userKeyWordService = userKeyWordService;
     }
 
     @Override
     public void setResponseSender(UiPlatform platform, BotResponseSender responseSender) {
-
+        responseSenderMap.put(platform, responseSender);
     }
 
     @Override
     public BotNetMessage processIncomingMessage(BotNetMessage message) {
-        commandsStorage.saveCommand(message.getMessage());
+        System.out.println("Got message from " + message.getUiPlatform() + " chatId = " + message.getUserChatId() + " message = " + message.getMessage());
 
-        BotNetMessage response = new BotNetMessage();
-        response.setUiPlatform(message.getUiPlatform());
-        response.setUserChatId(message.getUserChatId());
-        response.setMessage("Command accepted");
-        responseQueue.add(response);
+        if (userKeyWordService.isNewUser(message.getUiPlatform(), message.getUserChatId())) {
+            BotNetMessage response = new BotNetMessage();
+            response.setUiPlatform(message.getUiPlatform());
+            response.setUserChatId(message.getUserChatId());
+            response.setMessage("Hello. Please send me your userName");
+            responseQueue.add(response);
 
-        return response;
+            return response;
+        }
+        else if (!userKeyWordService.hasKeyWord(message.getUiPlatform(), message.getUserChatId())) {
+            String userKeyWord = userKeyWordService.registerUser(message.getUiPlatform(), message.getUserChatId(), message.getMessage());
+
+            BotNetMessage response = new BotNetMessage();
+            response.setUiPlatform(message.getUiPlatform());
+            response.setUserChatId(message.getUserChatId());
+            response.setMessage("Thank you. Your userName saved as '" + userKeyWord + "'. \n" +
+                    "Please send commands now.");
+            responseQueue.add(response);
+
+            return response;
+        }
+        else {
+            String userKeyWord = userKeyWordService.getUserKeyWord(message.getUiPlatform(), message.getUserChatId());
+            commandsStorage.saveCommand(userKeyWord, message.getMessage());
+
+            BotNetMessage response = new BotNetMessage();
+            response.setUiPlatform(message.getUiPlatform());
+            response.setUserChatId(message.getUserChatId());
+            response.setMessage("Command accepted");
+            responseQueue.add(response);
+
+            return response;
+        }
     }
 
     @Scheduled(fixedDelay = 1000)
