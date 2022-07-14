@@ -17,7 +17,7 @@ public class UserKeyWordServiceImpl implements UserKeyWordService {
     @Override
     public boolean isNewUser(UiPlatform platform, String userChatId) {
         String chatIdKey = getChatIdKey(platform, userChatId);
-        boolean contains = userSet.contains(chatIdKey);
+        boolean contains = !userSet.contains(chatIdKey);
         userSet.add(chatIdKey);
         return contains;
     }
