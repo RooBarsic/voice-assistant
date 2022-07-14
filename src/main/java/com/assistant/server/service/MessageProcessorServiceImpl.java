@@ -58,6 +58,16 @@ public class MessageProcessorServiceImpl implements BotLogic {
 
             return response;
         }
+        else if (message.getMessage().equals("/stop")) {
+            userKeyWordService.removeUser(message.getUiPlatform(), message.getUserChatId()) ;
+            BotNetMessage response = new BotNetMessage();
+            response.setUiPlatform(message.getUiPlatform());
+            response.setUserChatId(message.getUserChatId());
+            response.setMessage("Your userName was removed. Now you can set new userName.");
+            responseQueue.add(response);
+
+            return response;
+        }
         else {
             String userKeyWord = userKeyWordService.getUserKeyWord(message.getUiPlatform(), message.getUserChatId());
             commandsStorage.saveCommand(userKeyWord, message.getMessage());

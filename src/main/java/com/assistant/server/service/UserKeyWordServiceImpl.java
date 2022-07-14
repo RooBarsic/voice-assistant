@@ -23,6 +23,14 @@ public class UserKeyWordServiceImpl implements UserKeyWordService {
     }
 
     @Override
+    public boolean removeUser(UiPlatform platform, String userChatId) {
+        String chatIdKey = getChatIdKey(platform, userChatId);
+        userSet.remove(chatIdKey);
+        userByChatId.remove(chatIdKey);
+        return true;
+    }
+
+    @Override
     public boolean hasKeyWord(UiPlatform platform, String userChatId) {
         String chatIdKey = getChatIdKey(platform, userChatId);
         return userByChatId.containsKey(chatIdKey);
@@ -32,7 +40,7 @@ public class UserKeyWordServiceImpl implements UserKeyWordService {
     public String registerUser(UiPlatform platform, String userChatId, String userName) {
         String chatIdKey = getChatIdKey(platform, userChatId);
         userByChatId.put(chatIdKey, userName);
-        return chatIdKey;
+        return userName;
     }
 
     @Override
