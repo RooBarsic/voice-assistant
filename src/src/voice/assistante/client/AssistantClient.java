@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssistantClient {
-    private static final String PATH = "https://voice-assistant-server.herokuapp.com/commands/pool-first-commands?clientId=";
+    private static final String DEFAULT_USER = "user";
+    private static final String PATH = "https://voice-assistant-server.herokuapp.com/commands/pool-first-commands/" + DEFAULT_USER;
 
     private static List<Command> commandList = new ArrayList<>();
 
